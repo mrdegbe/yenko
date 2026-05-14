@@ -1,0 +1,76 @@
+from fastapi import APIRouter, Form
+from app.database import SessionLocal
+from app.services.ride_service import create_ride
+from app.config.locations import LOCATIONS
+
+router = APIRouter()
+
+
+@router.post("/ussd")
+def ussd(
+    sessionId: str = Form(...),
+    serviceCode: str = Form(...),
+    phoneNumber: str = Form(...),
+    text: str = Form(""),
+):
+
+    inputs = text.split("*")
+
+    # MAIN MENU
+    if text == "":
+
+        return "CON Welcome to Yenko\n" "1. Request Ride\n" "2. Become Rider"
+
+    # REQUEST RIDE
+    elif inputs[0] == "1":
+
+        # ask pickup
+        if len(inputs) == 1:
+
+            menu = "CON Select pickup location\n"
+
+            for key, value in LOCATIONS.items():
+
+                menu += f"{key}. {value}\n"
+
+            return menu
+            # return "CON Enter pickup location"
+
+        # ask destination
+        elif len(inputs) == 2:
+
+            menu = "CON Select destination\n"
+
+            for key, value in LOCATIONS.items():
+
+                menu += f"{key}. {value}\n"
+
+            return menu
+
+        # create ride
+        elif len(inputs) == 3:
+
+            pickup = LOCATIONS.get(inputs[1])
+
+            destination = LOCATIONS.get(inputs[2])
+
+            if not pickup or not destination:
+
+                return "END Invalid location"
+
+            db = SessionLocal()
+
+            try:
+
+                result = create_ride(db, phoneNumber, pickup, destination)
+                if isinstance(result, dict):
+
+                    return "END No riders available right now"
+
+            finally:
+
+                db.close()
+
+            return f"END Ride request sent\n" f"{pickup} -> {destination}"
+
+    return "END Invalid choice"
