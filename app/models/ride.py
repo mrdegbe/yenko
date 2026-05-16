@@ -30,3 +30,4 @@ class Ride(Base):
     expires_at = Column(
         DateTime, default=lambda: datetime.utcnow() + timedelta(seconds=60)
     )
+    fare = Column(Integer, nullable=True)

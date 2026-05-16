@@ -96,10 +96,10 @@ def seed_riders(db: Session = Depends(get_db)):
 
     riders = [
         Rider(
-            name="Kwame", phone="+233540000001", location="Anweaso", status="available"
+            name="Kwame", phone="+233240000001", location="Anweaso", status="available"
         ),
         Rider(
-            name="Yaw", phone="+233540000002", location="Akwatia", status="available"
+            name="Yaw", phone="+233240000002", location="Anweaso", status="available"
         ),
     ]
 
@@ -132,3 +132,41 @@ def active_rides(db: Session = Depends(get_db)):
     rides = db.query(Ride).filter(Ride.status.in_(["pending", "accepted"])).all()
 
     return rides
+
+
+@router.post("/approve-rider/{rider_id}")
+def approve_rider(rider_id: int, db: Session = Depends(get_db)):
+
+    rider = db.query(Rider).filter(Rider.id == rider_id).first()
+
+    if not rider:
+
+        return {"message": "Rider not found"}
+
+    rider.status = "available"
+
+    rider.is_available = True
+
+    db.commit()
+
+    return {"message": f"{rider.name} approved"}
+
+
+@router.get("/rider-summary/{rider_id}")
+def rider_summary(rider_id: int, db: Session = Depends(get_db)):
+
+    rider = db.query(Rider).filter(Rider.id == rider_id).first()
+
+    if not rider:
+
+        return {"message": "Rider not found"}
+
+    rides = db.query(Ride).filter(Ride.rider_id == rider.id).all()
+
+    return {
+        "rider": rider.name,
+        "location": rider.location,
+        "status": rider.status,
+        "earnings": rider.earnings,
+        "total_rides": len(rides),
+    }

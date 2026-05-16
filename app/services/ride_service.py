@@ -6,11 +6,16 @@ from app.models.rider import Rider
 from app.services.sms_service import send_sms
 from app.services.dispatch_service import notify_riders
 from app.services.rider_service import find_available_riders
+from app.services.fare_service import calculate_fare
 
 
 def create_ride(db, customer_phone, pickup, destination):
 
-    ride = Ride(customer_phone=customer_phone, pickup=pickup, destination=destination)
+    fare = calculate_fare(pickup, destination)
+
+    ride = Ride(
+        customer_phone=customer_phone, pickup=pickup, destination=destination, fare=fare
+    )
 
     db.add(ride)
 
@@ -97,6 +102,8 @@ def complete_ride(db, ride_id):
         rider.status = "available"
 
         rider.is_available = True
+
+        rider.earnings += ride.fare
 
     db.commit()
 

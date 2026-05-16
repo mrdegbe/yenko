@@ -4,5 +4,4 @@ LOCATIONS = {
     "3": "Anweaso",
     "4": "Nkwanta",
     "5": "Asubone",
-    "6": "Buadua",
 }

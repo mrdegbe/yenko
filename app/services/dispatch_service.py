@@ -8,6 +8,7 @@ def notify_riders(riders, ride):
         message = (
             f"YENKO RIDE\n"
             f"{ride.pickup} -> {ride.destination}\n"
+            f"Fare: GHS {ride.fare}\n"
             f"Reply YES {ride.id}"
         )
 

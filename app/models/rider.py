@@ -17,3 +17,5 @@ class Rider(Base):
     is_available = Column(Boolean, default=True)
 
     status = Column(String, default="offline")
+
+    earnings = Column(Integer, default=0)
