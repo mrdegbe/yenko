@@ -26,7 +26,7 @@ def handle_ride_acceptance(db, from_phone, text):
 
     if isinstance(result, dict):
 
-        return result
+        return {"message": result["error"]}
 
     return {"message": "Ride accepted"}
 
@@ -45,6 +45,6 @@ def handle_ride_completion(db, text):
 
     if isinstance(result, dict):
 
-        return result
+        return {"message": result["error"]}
 
     return {"message": "Ride completed"}

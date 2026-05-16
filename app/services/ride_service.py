@@ -41,11 +41,11 @@ def accept_ride(db, rider_phone, ride_id):
 
         return {"error": "Rider not found"}
 
-    ride = db.query(Ride).filter(Ride.id == ride_id).first()
+    ride = db.query(Ride).filter(Ride.id == ride_id, Ride.status == "pending").first()
 
     if not ride:
 
-        return {"error": "Ride not found"}
+        return {"error": "Ride unavailable"}
 
     if datetime.utcnow() > ride.expires_at:
 
