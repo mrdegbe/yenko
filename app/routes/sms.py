@@ -4,8 +4,17 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 
+from app.models import ride
+from app.models import ride
 from app.models.ride import Ride
 from app.models.rider import Rider
+
+from app.schemas.common import ApiResponse
+from app.schemas.ride import RideResponse
+from app.schemas.rider import RiderResponse
+from typing import List
+
+from app.auth.dependencies import get_current_admin
 
 from app.handlers.ride_handler import (
     handle_ride_request,
@@ -17,6 +26,7 @@ from app.handlers.rider_handler import go_online, go_offline
 
 
 from app.utils.parser import parse_ride_request
+from app.utils.response import error_response, success_response
 
 router = APIRouter()
 
@@ -110,20 +120,38 @@ def seed_riders(db: Session = Depends(get_db)):
     return {"message": "Seeded"}
 
 
-@router.get("/rides")
-def get_rides(db: Session = Depends(get_db)):
+@router.get("/rides", response_model=ApiResponse)
+def get_rides(current_admin=Depends(get_current_admin), db: Session = Depends(get_db)):
 
     rides = db.query(Ride).all()
 
-    return rides
+    return success_response(
+        "Rides fetched",
+        [
+            {
+                "ride_id": ride.id,
+                "pickup": ride.pickup,
+                "destination": ride.destination,
+                "fare": ride.fare,
+                "status": ride.status,
+            }
+            for ride in rides
+        ],
+    )
 
 
-@router.get("/riders")
-def get_riders(db: Session = Depends(get_db)):
+@router.get("/riders", response_model=ApiResponse)
+def get_riders(current_admin=Depends(get_current_admin), db: Session = Depends(get_db)):
 
     riders = db.query(Rider).all()
 
-    return riders
+    return success_response(
+        "Riders",
+        [
+            {"name": rider.name, "phone": rider.phone, "location": rider.location}
+            for rider in riders
+        ],
+    )
 
 
 @router.get("/active-rides")
@@ -131,7 +159,21 @@ def active_rides(db: Session = Depends(get_db)):
 
     rides = db.query(Ride).filter(Ride.status.in_(["pending", "accepted"])).all()
 
-    return rides
+    return (
+        success_response(
+            "Active rides",
+            [
+                {
+                    "ride_id": ride.id,
+                    "pickup": ride.pickup,
+                    "destination": ride.destination,
+                    "fare": ride.fare,
+                    "status": ride.status,
+                }
+                for ride in rides
+            ],
+        ),
+    )
 
 
 @router.post("/approve-rider/{rider_id}")
@@ -141,7 +183,7 @@ def approve_rider(rider_id: int, db: Session = Depends(get_db)):
 
     if not rider:
 
-        return {"message": "Rider not found"}
+        return error_response("Rider not found")
 
     rider.status = "available"
 
@@ -149,7 +191,7 @@ def approve_rider(rider_id: int, db: Session = Depends(get_db)):
 
     db.commit()
 
-    return {"message": f"{rider.name} approved"}
+    return success_response("Rider approved and is now online")
 
 
 @router.get("/rider-summary/{rider_id}")
@@ -159,14 +201,17 @@ def rider_summary(rider_id: int, db: Session = Depends(get_db)):
 
     if not rider:
 
-        return {"message": "Rider not found"}
+        return error_response("Rider not found")
 
     rides = db.query(Ride).filter(Ride.rider_id == rider.id).all()
 
-    return {
-        "rider": rider.name,
-        "location": rider.location,
-        "status": rider.status,
-        "earnings": rider.earnings,
-        "total_rides": len(rides),
-    }
+    return success_response(
+        "Rider summary",
+        {
+            "rider": rider.name,
+            "location": rider.location,
+            "status": rider.status,
+            "earnings": rider.earnings,
+            "total_rides": len(rides),
+        },
+    )

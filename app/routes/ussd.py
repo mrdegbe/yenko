@@ -67,7 +67,9 @@ def ussd(
             try:
 
                 result = create_ride(db, phoneNumber, pickup, destination)
-                if isinstance(result, dict):
+
+                # if isinstance(result, dict):
+                if not result["success"]:
 
                     return "END No riders available right now"
 

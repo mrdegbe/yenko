@@ -7,6 +7,7 @@ from app.services.sms_service import send_sms
 from app.services.dispatch_service import notify_riders
 from app.services.rider_service import find_available_riders
 from app.services.fare_service import calculate_fare
+from app.utils.response import success_response, error_response
 
 
 def create_ride(db, customer_phone, pickup, destination):
@@ -31,11 +32,19 @@ def create_ride(db, customer_phone, pickup, destination):
 
         db.commit()
 
-        return {"error": "No riders available"}
+        return error_response("No riders available")
 
     notify_riders(riders, ride)
 
-    return ride
+    return success_response(
+        "Ride created",
+        {
+            "ride_id": ride.id,
+            "pickup": ride.pickup,
+            "destination": ride.destination,
+            "fare": ride.fare,
+        },
+    )
 
 
 def accept_ride(db, rider_phone, ride_id):
@@ -50,7 +59,7 @@ def accept_ride(db, rider_phone, ride_id):
 
     if not ride:
 
-        return {"error": "Ride unavailable"}
+        return error_response("Ride unavailable")
 
     if datetime.utcnow() > ride.expires_at:
 
@@ -80,7 +89,7 @@ def accept_ride(db, rider_phone, ride_id):
 
     print(f"Ride {ride.id} accepted by {rider.name}")
 
-    return ride
+    return success_response("Ride accepted")
 
 
 def complete_ride(db, ride_id):
@@ -89,7 +98,7 @@ def complete_ride(db, ride_id):
 
     if not ride:
 
-        return {"error": "Ride not found"}
+        return error_response("Ride unavailable")
 
     rider = db.query(Rider).filter(Rider.id == ride.rider_id).first()
 
@@ -109,4 +118,4 @@ def complete_ride(db, ride_id):
 
     print(f"Ride {ride.id} completed")
 
-    return ride
+    return success_response("Ride completed")

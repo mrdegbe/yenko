@@ -1,6 +1,7 @@
 from app.utils.parser import parse_ride_request
 
 from app.services.ride_service import create_ride, accept_ride, complete_ride
+from app.utils.response import error_response, success_response
 
 
 def handle_ride_request(db, from_phone, text):
@@ -9,7 +10,7 @@ def handle_ride_request(db, from_phone, text):
 
     create_ride(db, from_phone, pickup, destination)
 
-    return {"message": "Ride created"}
+    return success_response("Ride request received")
 
 
 def handle_ride_acceptance(db, from_phone, text):
@@ -18,17 +19,18 @@ def handle_ride_acceptance(db, from_phone, text):
 
     if len(parts) < 2:
 
-        return {"message": "Invalid format"}
+        return error_response("Invalid format")
 
     ride_id = int(parts[1])
 
     result = accept_ride(db, from_phone, ride_id)
 
-    if isinstance(result, dict):
+    # if isinstance(result, dict):
+    if not result["success"]:
 
-        return {"message": result["error"]}
+        return error_response(result["success"])
 
-    return {"message": "Ride accepted"}
+    return success_response("Ride accepted")
 
 
 def handle_ride_completion(db, text):
@@ -37,14 +39,15 @@ def handle_ride_completion(db, text):
 
     if len(parts) < 2:
 
-        return {"message": "Invalid format"}
+        return error_response("Invalid format")
 
     ride_id = int(parts[1])
 
     result = complete_ride(db, ride_id)
 
-    if isinstance(result, dict):
+    # if isinstance(result, dict):
+    if not result["success"]:
 
-        return {"message": result["error"]}
+        return error_response(result["success"])
 
-    return {"message": "Ride completed"}
+    return success_response("Ride completed")

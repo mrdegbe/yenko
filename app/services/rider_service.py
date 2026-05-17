@@ -1,4 +1,5 @@
 from app.models.rider import Rider
+from app.utils.response import success_response, error_response
 
 
 def find_available_riders(db, pickup):
@@ -18,7 +19,7 @@ def register_rider(db, name, phone, location):
 
     if existing:
 
-        return {"error": "Rider already exists"}
+        return error_response("Rider already exists")
 
     rider = Rider(
         name=name, phone=phone, location=location, is_available=False, status="pending"

@@ -1,5 +1,6 @@
 from app.models.rider import Rider
 from app.services.rider_service import register_rider
+from app.utils.response import error_response, success_response
 
 
 def go_online(db, from_phone):
@@ -8,7 +9,7 @@ def go_online(db, from_phone):
 
     if not rider:
 
-        return {"message": "Rider not found"}
+        return error_response("Rider not found")
 
     rider.status = "available"
 
@@ -16,7 +17,7 @@ def go_online(db, from_phone):
 
     db.commit()
 
-    return {"message": "You are now online"}
+    return success_response("You are now online")
 
 
 def go_offline(db, from_phone):
@@ -25,7 +26,7 @@ def go_offline(db, from_phone):
 
     if not rider:
 
-        return {"message": "Rider not found"}
+        return error_response("Rider not found")
 
     rider.status = "offline"
 
@@ -33,7 +34,7 @@ def go_offline(db, from_phone):
 
     db.commit()
 
-    return {"message": "You are now offline"}
+    return success_response("You are now offline")
 
 
 def handle_rider_registration(db, phone, text, locations):
@@ -66,7 +67,8 @@ def handle_rider_registration(db, phone, text, locations):
 
         result = register_rider(db, name, phone, location)
 
-        if isinstance(result, dict):
+        # if isinstance(result, dict):
+        if not result["success"]:
 
             return "END Rider already exists"
 
