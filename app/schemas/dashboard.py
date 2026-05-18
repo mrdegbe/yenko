@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from app.schemas.common import ApiResponse
 
 
 class DashboardStats(BaseModel):
@@ -16,3 +17,10 @@ class DashboardStats(BaseModel):
     available_riders: int
 
     total_revenue: int
+
+
+
+
+class DashboardResponse(ApiResponse):
+
+    data: DashboardStats
