@@ -19,8 +19,6 @@ class DashboardStats(BaseModel):
     total_revenue: int
 
 
-
-
 class DashboardResponse(ApiResponse):
 
     data: DashboardStats

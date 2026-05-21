@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Form
 from app.database import SessionLocal
-from app.services.ride_service import create_ride
+from app.services.ride.create import create_ride
 from app.config.locations import LOCATIONS
-from app.handlers.rider_handler import handle_rider_registration
-from app.services.fare_service import calculate_fare
+from app.handlers.rider import handle_rider_registration
+from app.utils.fare import calculate_fare
 
 router = APIRouter()
 
@@ -52,13 +52,11 @@ def ussd(
         # create ride
         elif len(inputs) == 3:
 
-            pickup = LOCATIONS.get(inputs[1])
+            pickup_location = LOCATIONS.get(inputs[1])
 
             destination = LOCATIONS.get(inputs[2])
 
-            fare = calculate_fare(pickup, destination)
-
-            if not pickup or not destination:
+            if not pickup_location or not destination:
 
                 return "END Invalid location"
 
@@ -66,10 +64,10 @@ def ussd(
 
             try:
 
-                result = create_ride(db, phoneNumber, pickup, destination)
+                result = create_ride(db, phoneNumber, pickup_location, destination)
 
-                # if isinstance(result, dict):
-                if not result["success"]:
+                # if not result:
+                if isinstance(result, dict):
 
                     return "END No riders available right now"
 
@@ -79,8 +77,8 @@ def ussd(
 
             return (
                 f"END Ride request sent\n"
-                f"{pickup} -> {destination}\n"
-                f"Fare: GHS {fare}"
+                f"{result.pickup_location} -> {result.destination}\n"
+                f"Fare: GHS {result.fare}"
             )
     # BECOME RIDER
     elif inputs[0] == "2":

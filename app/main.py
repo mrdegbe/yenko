@@ -9,6 +9,8 @@ from app.routes.sms import router as sms_router
 from app.routes.ussd import router as ussd_router
 from app.routes.auth import router as auth_router
 from app.routes.dashboard import router as dashboard_router
+from app.routes.ride import router as ride_router
+from app.routes.rider import router as rider_router
 
 from app.utils.response import success_response
 
@@ -27,3 +29,5 @@ app.include_router(auth_router)
 app.include_router(sms_router)
 app.include_router(ussd_router)
 app.include_router(dashboard_router)
+app.include_router(ride_router)
+app.include_router(rider_router)

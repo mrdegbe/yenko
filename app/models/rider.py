@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 from app.database import Base
 
 
@@ -16,6 +17,9 @@ class Rider(Base):
 
     is_available = Column(Boolean, default=True)
 
+    # status = Column(String, default="offline")
     status = Column(String, default="offline")
 
     earnings = Column(Integer, default=0)
+
+    rides = relationship("Ride", back_populates="rider")

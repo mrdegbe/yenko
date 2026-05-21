@@ -2,7 +2,10 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 
 from datetime import datetime, timedelta
 
+from app.constants.ride_status import *
 from app.database import Base
+
+from sqlalchemy.orm import relationship
 
 
 class Ride(Base):
@@ -13,11 +16,11 @@ class Ride(Base):
 
     customer_phone = Column(String)
 
-    pickup = Column(String)
+    pickup_location = Column(String)
 
     destination = Column(String)
 
-    status = Column(String, default="pending")
+    status = Column(String, default=PENDING)
 
     rider_id = Column(Integer, ForeignKey("riders.id"), nullable=True)
 
@@ -31,3 +34,5 @@ class Ride(Base):
         DateTime, default=lambda: datetime.utcnow() + timedelta(seconds=60)
     )
     fare = Column(Integer, nullable=True)
+
+    rider = relationship("Rider", back_populates="rides")

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 
+from app.constants.ride_status import *
 from app.database import get_db
 
 from app.models.ride import Ride
@@ -27,9 +28,9 @@ def dashboard_stats(
 
     completed_rides = [ride for ride in rides if ride.status == "completed"]
 
-    pending_rides = [ride for ride in rides if ride.status == "pending"]
+    pending_rides = [ride for ride in rides if ride.status == PENDING]
 
-    accepted_rides = [ride for ride in rides if ride.status == "accepted"]
+    accepted_rides = [ride for ride in rides if ride.status == ACCEPTED]
 
     available_riders = [rider for rider in riders if rider.is_available]
 

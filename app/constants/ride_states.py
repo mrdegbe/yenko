@@ -1,0 +1,17 @@
+from app.constants.ride_status import (
+    PENDING,
+    ACCEPTED,
+    COMPLETED,
+    EXPIRED,
+    CANCELLED,
+    NO_RIDER,
+)
+
+ALLOWED_TRANSITIONS = {
+    PENDING: [ACCEPTED, EXPIRED, CANCELLED, NO_RIDER],
+    ACCEPTED: [COMPLETED, CANCELLED],
+    COMPLETED: [],
+    EXPIRED: [],
+    CANCELLED: [],
+    NO_RIDER: [],
+}

@@ -1,5 +1,5 @@
 from app.models.rider import Rider
-from app.services.rider_service import register_rider
+from app.services.rider.register import register_rider
 from app.utils.response import error_response, success_response
 
 
