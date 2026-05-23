@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Form
+from fastapi.responses import PlainTextResponse
 from app.database import SessionLocal
 from app.services.ride.create import create_ride
 from app.config.locations import LOCATIONS
@@ -21,12 +22,14 @@ def ussd(
     # MAIN MENU
     if text == "":
 
-        return "CON Welcome to Yenko\n" "1. Request Ride\n" "2. Become Rider"
+        return PlainTextResponse(
+            "CON Welcome to Yenko\n" "1. Request Ride\n" "2. Become Rider"
+        )
 
     # REQUEST RIDE
     elif inputs[0] == "1":
 
-        # ask pickup
+        # ask pickup location
         if len(inputs) == 1:
 
             menu = "CON Select pickup location\n"
@@ -35,8 +38,7 @@ def ussd(
 
                 menu += f"{key}. {value}\n"
 
-            return menu
-            # return "CON Enter pickup location"
+            return PlainTextResponse(menu)
 
         # ask destination
         elif len(inputs) == 2:
@@ -47,7 +49,7 @@ def ussd(
 
                 menu += f"{key}. {value}\n"
 
-            return menu
+            return PlainTextResponse(menu)
 
         # create ride
         elif len(inputs) == 3:
@@ -58,7 +60,7 @@ def ussd(
 
             if not pickup_location or not destination:
 
-                return "END Invalid location"
+                return PlainTextResponse("END Invalid location")
 
             db = SessionLocal()
 
@@ -67,18 +69,20 @@ def ussd(
                 result = create_ride(db, phoneNumber, pickup_location, destination)
 
                 # if not result:
-                if isinstance(result, dict):
+                if not result["success"]:
 
-                    return "END No riders available right now"
+                    return PlainTextResponse(f"END {result['message']}")
+
+                ride = result["data"]
 
             finally:
 
                 db.close()
 
-            return (
+            return PlainTextResponse(
                 f"END Ride request sent\n"
-                f"{result.pickup_location} -> {result.destination}\n"
-                f"Fare: GHS {result.fare}"
+                f"{ride.pickup_location} -> {ride.destination}\n"
+                f"Fare: GHS {ride.fare}"
             )
     # BECOME RIDER
     elif inputs[0] == "2":
@@ -93,4 +97,4 @@ def ussd(
 
             db.close()
 
-    return "END Invalid choice"
+    return PlainTextResponse("END Invalid choice")

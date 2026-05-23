@@ -32,15 +32,33 @@ def seed_riders(db: Session = Depends(get_db)):
 
     riders = [
         Rider(
-            name="Kwame",
+            name="Kwadjo",
             phone="+233240000001",
+            location="Number 4",
+            status="online",
+        ),
+        Rider(
+            name="Kwabena",
+            phone="+233240000002",
+            location="Nkwanta",
+            status="online",
+        ),
+        Rider(
+            name="Kwaku",
+            phone="+233240000003",
             location="Anweaso",
             status="online",
         ),
         Rider(
             name="Yaw",
-            phone="+233240000002",
-            location="Anweaso",
+            phone="+233240000004",
+            location="Asubone",
+            status="online",
+        ),
+        Rider(
+            name="Kofi",
+            phone="+233240000005",
+            location="Akwatia",
             status="online",
         ),
     ]

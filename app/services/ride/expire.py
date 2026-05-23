@@ -1,15 +1,15 @@
 from datetime import datetime, timedelta
 
-from app.constants.ride_status import EXPIRED
+from app.constants.ride_status import EXPIRED, PENDING
 from app.models.ride import Ride
 
 
-def expire_pending_rides(db, timeout_minutes=2):
+def expire_pending_rides(db, timeout_minutes=3):
 
     cutoff = datetime.utcnow() - timedelta(minutes=timeout_minutes)
 
     rides = (
-        db.query(Ride).filter(Ride.status == "pending", Ride.created_at < cutoff).all()
+        db.query(Ride).filter(Ride.status == PENDING, Ride.created_at < cutoff).all()
     )
 
     expired_count = 0

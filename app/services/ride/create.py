@@ -25,11 +25,13 @@ def create_ride(db, customer_phone, pickup_location, destination):
     riders = find_matching_riders(db, pickup_location)
 
     if not riders:
+
         ride.status = NO_RIDER
+
         db.commit()
 
-        return error_response("No riders available")
+        return error_response("No riders available right now")
 
     broadcast_ride_request(riders, ride)
 
-    return ride
+    return success_response("Ride request sent", data=ride)

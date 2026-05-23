@@ -8,9 +8,9 @@ from app.utils.response import error_response, success_response
 
 def handle_ride_request(db, from_phone, text):
 
-    pickup, destination = parse_ride_request(text)
+    pickup_location, destination = parse_ride_request(text)
 
-    create_ride(db, from_phone, pickup, destination)
+    create_ride(db, from_phone, pickup_location, destination)
 
     return success_response("Ride request received")
 

@@ -8,7 +8,7 @@ class RideResponse(BaseModel):
 
     customer_phone: str
 
-    pickup: str
+    pickup_location: str
 
     destination: str
 

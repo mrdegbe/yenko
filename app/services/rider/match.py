@@ -1,10 +1,10 @@
-from app.constants.ride_status import NO_RIDER
 from app.models.rider import Rider
-
 from app.constants.rider_status import ONLINE
 
 
 def find_matching_riders(db, pickup_location):
+
+    print("Searching pickup:", pickup_location)
 
     riders = (
         db.query(Rider)
@@ -16,13 +16,10 @@ def find_matching_riders(db, pickup_location):
         .all()
     )
 
-    if not riders:
+    print("Matched riders:", len(riders))
 
-        print(f"No riders available for {pickup_location}")
+    for rider in riders:
 
-        Rider.status = NO_RIDER
-        db.commit()
-
-        return
+        print(rider.name, rider.location, rider.status, rider.is_available)
 
     return riders

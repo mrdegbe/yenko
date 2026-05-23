@@ -8,6 +8,7 @@ from app.models.ride import Ride
 from app.schemas.common import ApiResponse
 from app.utils.response import success_response
 from app.services.ride.complete import complete_ride as crs
+from app.services.ride.cancel import cancel_ride as ccr
 
 router = APIRouter()
 
@@ -22,7 +23,7 @@ def get_rides(current_admin=Depends(get_current_admin), db: Session = Depends(ge
         [
             {
                 "ride_id": ride.id,
-                "pickup": ride.pickup_location,
+                "pickup_location": ride.pickup_location,
                 "destination": ride.destination,
                 "fare": ride.fare,
                 "status": ride.status,
@@ -43,7 +44,7 @@ def active_rides(db: Session = Depends(get_db)):
             [
                 {
                     "ride_id": ride.id,
-                    "pickup": ride.pickup_location,
+                    "pickup_location": ride.pickup_location,
                     "destination": ride.destination,
                     "fare": ride.fare,
                     "status": ride.status,
@@ -91,26 +92,8 @@ def complete_ride(
 
 
 @router.post("/rides/{ride_id}/cancel")
-def cancel_ride(
-    ride_id: int,
-    current_admin=Depends(get_current_admin),
-    db: Session = Depends(get_db),
-):
+def cancel_ride(ride_id: int, db: Session = Depends(get_db)):
 
-    ride = db.query(Ride).filter(Ride.id == ride_id).first()
+    result = ccr(db, ride_id)
 
-    if not ride:
-
-        return {"success": False, "message": "Ride not found"}
-
-    ride.status = CANCELLED
-
-    rider = ride.rider
-
-    if rider:
-
-        rider.is_available = True
-
-    db.commit()
-
-    return {"success": True, "message": "Ride cancelled"}
+    return result
